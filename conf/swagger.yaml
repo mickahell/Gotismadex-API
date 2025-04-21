@@ -1,0 +1,81 @@
+basePath: /
+consumes:
+    - application/json
+definitions:
+    CommonError:
+        x-go-package: github.com/mickahell/Gotismadex/docs
+    CommonSuccess:
+        x-go-package: github.com/mickahell/Gotismadex/docs
+    Health:
+        x-go-package: github.com/mickahell/Gotismadex/modules/health
+    Status:
+        x-go-package: github.com/mickahell/Gotismadex/modules/health
+info:
+    description: |-
+        the purpose of this application is to provide an application
+        that is using plain go code to define an API
+    termsOfService: not yet...
+    title: Gotismadex
+    version: latest
+paths:
+    /auth/profile:
+        get:
+            operationId: ProfileCheck
+            responses:
+                "200":
+                    description: CommonSuccess
+                    schema:
+                        $ref: '#/definitions/CommonSuccess'
+                "404":
+                    description: CommonError
+                    schema:
+                        $ref: '#/definitions/CommonError'
+            summary: Get the profile.
+            tags:
+                - heath
+    /auth/status:
+        get:
+            operationId: StatusCheck
+            responses:
+                "200":
+                    description: CommonSuccess
+                    schema:
+                        $ref: '#/definitions/CommonSuccess'
+                "404":
+                    description: CommonError
+                    schema:
+                        $ref: '#/definitions/CommonError'
+            summary: Get the status.
+            tags:
+                - heath
+    /health:
+        get:
+            operationId: HealthsCheck
+            responses:
+                "200":
+                    description: CommonSuccess
+                    schema:
+                        $ref: '#/definitions/CommonSuccess'
+                "404":
+                    description: CommonError
+                    schema:
+                        $ref: '#/definitions/CommonError'
+            security:
+                - apiKey:
+                    - '[]'
+            summary: Get the health.
+            tags:
+                - heath
+produces:
+    - application/json
+schemes:
+    - http
+    - https
+security:
+    - key: []
+securityDefinitions:
+    key:
+        in: header
+        name: X-Session-Token
+        type: apiKey
+swagger: "2.0"

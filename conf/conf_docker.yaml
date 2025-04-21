@@ -1,0 +1,25 @@
+# database
+userdb: "root"
+passdb: "PASS_DB"
+ipdb: "host.docker.internal"
+portdb: "3306"
+namedb: "gotismadex"
+extradb: "?parseTime=true"
+# log
+## 0 : Informational
+## 1 : Warning
+## 2 : Error --> Always
+## 3 : Critical --> Always
+loglevel: 0
+# access api
+usersapi:
+  - "test"
+tokensapi:
+  - "TOKEN_API_TEST"
+# specimen data
+specimen: false
+# name api
+nameapi: "Gotismadex"
+portapi: "8080"
+# Country api
+country: "FR"
