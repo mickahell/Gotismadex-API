@@ -19,6 +19,7 @@ type Logger struct {
 }
 
 const DrawColor = "\033[96;1m"
+const NoneColor = "\033[0m"
 
 var mylog Logger
 
@@ -29,7 +30,7 @@ func (log *Logger) LogInit() {
 func (log *Logger) LogDraw(drawing string) {
 	log.drawing = drawing
 
-	fmt.Fprintln(os.Stdout, DrawColor, string(log.drawing))
+	fmt.Fprintln(os.Stdout, DrawColor, string(log.drawing), NoneColor)
 }
 
 func (log *Logger) LogInfo(endpoint string, message string) {

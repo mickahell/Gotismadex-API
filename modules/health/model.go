@@ -47,7 +47,7 @@ func GetHealth() *Health {
 	var hea Health
 
 	hea.Title = "IT works !"
-	hea.Message = "Gosmo is feeling API today :)"
+	hea.Message = "Gotisma is feeling API today :)"
 
 	return &hea
 }
@@ -58,7 +58,7 @@ func GetStatus() *Status {
 	sta.Title = "Status"
 	sta.Name = TheAppConfig().Nameapi
 	sta.Version = TheVersion()
-	sta.Message = "Gosmo is feeling API today :)"
+	sta.Message = "Gotisma is feeling API today :)"
 
 	err := TheDb().Ping()
 	if err != nil {
