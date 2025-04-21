@@ -1,0 +1,82 @@
+name: Docker image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+env:
+  IMAGE_NAME: "gotismadex"
+  DOCKERHUB_USER: "mickahell"
+  DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
+
+jobs:
+  docker:
+    name: Build image
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      matrix:
+        img_full: ["false", "true"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get version
+        id: img-version
+        run: |
+          if [[ "${{ matrix.img_full }}" == "true" ]]; then
+            echo "IMAGE_NAME_VERS=${{ env.IMAGE_NAME }}-full" >> "$GITHUB_OUTPUT"
+          else
+            echo "IMAGE_NAME_VERS=${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get params
+        id: params
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "IMAGE_NAME_UP=${{ steps.img-version.outputs.IMAGE_NAME_VERS }}" >> "$GITHUB_OUTPUT"
+            echo "OWNER_ADD=${{ env.DOCKERHUB_USER }}" >> "$GITHUB_OUTPUT"
+            echo "REGISTRY_ADD=" >> "$GITHUB_OUTPUT"
+          else
+            echo "IMAGE_NAME_UP=${{ steps.img-version.outputs.IMAGE_NAME_VERS }}-dev" >> "$GITHUB_OUTPUT"
+            echo "OWNER_ADD=${{ github.repository_owner }}" >> "$GITHUB_OUTPUT"
+            echo "REGISTRY_ADD=ghcr.io/" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version_tag=$(cat VERSION.txt)" >> "$GITHUB_OUTPUT"
+      - name: Get image name
+        id: image-name
+        run: |
+          IMAGE_ID=${{ steps.params.outputs.REGISTRY_ADD }}${{ steps.params.outputs.OWNER_ADD }}/${{ steps.params.outputs.IMAGE_NAME_UP }}
+          echo "IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        run: |
+          docker build . \
+            --build-arg IMAGE_NAME="${{ steps.params.outputs.IMAGE_NAME_UP }}" \
+            --build-arg GITHUB_ACTOR="${{ github.repository_owner }}" \
+            --build-arg GITHUB_REPOSITORY="${{ github.repository }}" \
+            --build-arg GITHUB_REF="${{ steps.params.outputs.version_tag }}" \
+            --build-arg FULL="${{ matrix.img_full }}" \
+            --file docker/Dockerfile \
+            --tag ${{ steps.params.outputs.OWNER_ADD }}/${{ steps.params.outputs.IMAGE_NAME_UP }}:${{ steps.params.outputs.version_tag }}
+      - name: Tag image
+        run: |
+          docker tag ${{ steps.params.outputs.OWNER_ADD }}/${{ steps.params.outputs.IMAGE_NAME_UP }}:${{ steps.params.outputs.version_tag }} \
+            ${{ steps.image-name.outputs.IMAGE_ID }}:latest
+
+      - name: Log in to GitHub registry
+        if: github.ref_type == 'branch'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Login to DockerHub registry
+        if: github.ref_type == 'tag'
+        run: |
+          docker login --username=${{ env.DOCKERHUB_USER }} --password=${{ env.DOCKERHUB_PASS }}
+
+      - name: Push image to registry
+        run: |
+          docker push ${{ steps.image-name.outputs.IMAGE_ID }} --all-tags
