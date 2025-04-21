@@ -26,7 +26,7 @@ If you want to contribute in the framework, check the issue and/or send [me](htt
 
 ## How to start
 
-The project if based on `Go=1.19` (currently the latest on date 2022/11). And its running using `Docker`, for testing developpment, it can also be run locally. All it need is setting up a local `database`. And some variables from the `.envrc` file.
+The project if based on `Go=1.23.8` (currently the latest on date 2022/11). And its running using `Docker`, for testing developpment, it can also be run locally. All it need is setting up a local `database`. And some variables from the `.envrc` file.
 
 ```
 export PASS_DB=root

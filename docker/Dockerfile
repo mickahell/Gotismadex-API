@@ -1,5 +1,5 @@
 # Builder stage
-FROM golang:1.19-alpine3.16 as builder
+FROM golang:1.23-alpine3.20 as builder
 
 ENV GO111MODULE=on \
     GOOS=linux \
